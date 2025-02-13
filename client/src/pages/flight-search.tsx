@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,9 +18,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, PlaneTakeoff, Clock, ArrowRight } from "lucide-react";
+import { CalendarIcon, PlaneTakeoff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { generateFlights, type Flight } from "@/lib/mock-flights";
+import { generateFlights } from "@/lib/mock-flights";
 
 const flightClasses = [
   { value: "economy", label: "Economy" },
@@ -28,11 +29,11 @@ const flightClasses = [
 ];
 
 export default function FlightSearch() {
+  const [, setLocation] = useLocation();
   const [date, setDate] = useState<Date>();
   const [departureCity, setDepartureCity] = useState("");
   const [arrivalCity, setArrivalCity] = useState("");
   const [flightClass, setFlightClass] = useState("");
-  const [flights, setFlights] = useState<Flight[]>([]);
   const [searching, setSearching] = useState(false);
 
   const handleSearch = () => {
@@ -49,14 +50,17 @@ export default function FlightSearch() {
         date,
         flightClass
       );
-      setFlights(generatedFlights);
       setSearching(false);
+
+      // Redirect to results page with flight data
+      const flightsParam = encodeURIComponent(JSON.stringify(generatedFlights));
+      setLocation(`/flight-results?flights=${flightsParam}`);
     }, 1000);
   };
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <Card className="max-w-2xl mx-auto mb-8">
+    <div className="min-h-screen bg-gray-50 py-12">
+      <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <PlaneTakeoff className="h-6 w-6" />
@@ -139,40 +143,6 @@ export default function FlightSearch() {
           </Button>
         </CardContent>
       </Card>
-
-      {flights.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Available Flights</h2>
-          {flights.map((flight) => (
-            <Card key={flight.id} className="hover:border-primary transition-colors">
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Airline</p>
-                    <p className="font-medium">{flight.airline}</p>
-                    <p className="text-sm text-muted-foreground">{flight.flightNumber}</p>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="text-center">
-                      <p className="text-xl font-bold">{format(flight.departureTime, "HH:mm")}</p>
-                      <p className="text-sm text-muted-foreground">{flight.departureCity}</p>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground mx-2" />
-                    <div className="text-center">
-                      <p className="text-xl font-bold">{format(flight.arrivalTime, "HH:mm")}</p>
-                      <p className="text-sm text-muted-foreground">{flight.arrivalCity}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold">${flight.price}</p>
-                    <p className="text-sm text-muted-foreground capitalize">{flight.class}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

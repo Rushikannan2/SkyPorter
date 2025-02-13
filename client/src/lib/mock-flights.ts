@@ -10,14 +10,15 @@ export interface Flight {
   airline: string;
   flightNumber: string;
   class: string;
+  duration: string;
 }
 
 const airlines = [
-  "SkyWings",
-  "BlueLine",
-  "AirSpeed",
-  "StarJet",
-  "GlobalAir"
+  "IndiGo",
+  "Air India",
+  "SpiceJet",
+  "Vistara",
+  "Go First"
 ];
 
 function generateFlightNumber(): string {
@@ -27,11 +28,19 @@ function generateFlightNumber(): string {
 }
 
 function generatePrice(flightClass: string): number {
-  const basePrice = Math.floor(Math.random() * 300) + 200;
+  // Base price in rupees (₹3000-₹8000)
+  const basePrice = Math.floor(Math.random() * 5000) + 3000;
   const multiplier = flightClass === "economy" ? 1 : 
                     flightClass === "business" ? 2.5 : 
                     4; // first class
   return Math.floor(basePrice * multiplier);
+}
+
+function calculateDuration(startTime: Date, endTime: Date): string {
+  const diff = endTime.getTime() - startTime.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  return `${hours}h ${minutes}m`;
 }
 
 export function generateFlights(
@@ -45,7 +54,9 @@ export function generateFlights(
 
   for (let i = 0; i < numFlights; i++) {
     const departureTime = new Date(date);
-    departureTime.setHours(Math.floor(Math.random() * 24));
+    // Generate flights between 6 AM and 10 PM
+    const hour = Math.floor(Math.random() * 16) + 6;
+    departureTime.setHours(hour);
     departureTime.setMinutes(Math.floor(Math.random() * 4) * 15); // Round to nearest 15 mins
 
     const flightDuration = Math.floor(Math.random() * 3) + 1; // 1-3 hours
@@ -60,7 +71,8 @@ export function generateFlights(
       price: generatePrice(flightClass),
       airline: airlines[Math.floor(Math.random() * airlines.length)],
       flightNumber: generateFlightNumber(),
-      class: flightClass
+      class: flightClass,
+      duration: calculateDuration(departureTime, arrivalTime)
     });
   }
 

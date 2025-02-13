@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Components from "@/pages/components";
 import FlightSearch from "@/pages/flight-search";
+import FlightResults from "@/pages/flight-results";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
         <Switch>
           <Route path="/" component={FlightSearch} />
           <Route path="/flights" component={FlightSearch} />
+          <Route path="/flight-results" component={FlightResults} />
           <Route path="/components" component={Components} />
           <Route component={NotFound} />
         </Switch>
