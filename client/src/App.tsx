@@ -14,9 +14,9 @@ function Router() {
       <Navbar />
       <main>
         <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/components" component={Components} />
+          <Route path="/" component={FlightSearch} />
           <Route path="/flights" component={FlightSearch} />
+          <Route path="/components" component={Components} />
           <Route component={NotFound} />
         </Switch>
       </main>
