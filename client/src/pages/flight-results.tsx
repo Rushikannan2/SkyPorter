@@ -8,7 +8,7 @@ export default function FlightResults() {
   const [, setLocation] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const flightsData = searchParams.get("flights");
-  
+
   if (!flightsData) {
     setLocation("/flights");
     return null;
@@ -16,12 +16,21 @@ export default function FlightResults() {
 
   const flights: Flight[] = JSON.parse(decodeURIComponent(flightsData));
 
+  const handleFlightSelect = (flight: Flight) => {
+    const flightParam = encodeURIComponent(JSON.stringify(flight));
+    setLocation(`/flight-booking?flight=${flightParam}`);
+  };
+
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold mb-6">Available Flights</h1>
       <div className="space-y-4">
         {flights.map((flight) => (
-          <Card key={flight.id} className="hover:border-primary transition-colors">
+          <Card 
+            key={flight.id} 
+            className="hover:border-primary transition-colors cursor-pointer"
+            onClick={() => handleFlightSelect(flight)}
+          >
             <CardContent className="pt-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
@@ -50,8 +59,8 @@ export default function FlightResults() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold">₹{flight.price.toLocaleString('en-IN')}</p>
                   <p className="text-sm text-muted-foreground capitalize">{flight.class}</p>
+                  <p className="text-sm text-muted-foreground">Click to view price</p>
                 </div>
               </div>
             </CardContent>
