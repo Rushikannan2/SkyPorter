@@ -16,6 +16,11 @@ export default function Navbar() {
                 Home
               </a>
             </Link>
+            <Link href="/flights">
+              <a className="text-foreground hover:text-primary transition-colors">
+                Flight Search
+              </a>
+            </Link>
             <Link href="/components">
               <a className="text-foreground hover:text-primary transition-colors">
                 Components

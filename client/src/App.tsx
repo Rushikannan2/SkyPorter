@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/navbar";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Components from "@/pages/components";
+import FlightSearch from "@/pages/flight-search";
 
 function Router() {
   return (
@@ -15,6 +16,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/components" component={Components} />
+          <Route path="/flights" component={FlightSearch} />
           <Route component={NotFound} />
         </Switch>
       </main>
