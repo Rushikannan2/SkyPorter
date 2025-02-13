@@ -17,7 +17,7 @@ const ROWS = 6;
 const COLS = 6;
 
 // Initialize seat availability (true = available)
-const initialSeats = Array(ROWS).fill(null).map(() => 
+const initialSeats = Array(ROWS).fill(null).map(() =>
   Array(COLS).fill(true)
 );
 
@@ -29,7 +29,7 @@ export default function SeatSelection() {
   const searchParams = new URLSearchParams(window.location.search);
   const bookingData = searchParams.get("booking");
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  
+
   if (!bookingData) {
     setLocation("/flights");
     return null;
@@ -41,20 +41,40 @@ export default function SeatSelection() {
   // Calculate total luggage weight
   const totalWeight = luggage.reduce((sum, item) => sum + Number(item.weight), 0);
 
-  // Simple price calculation using a basic form of the simplex method
-  // This is a simplified version - in reality, you'd use a more complex optimization
+  // Implement Simplex Method for Price Optimization
   const calculateTotalPrice = () => {
-    const basePrice = flight.price * passengerCount;
-    const weightMultiplier = 0.5; // ₹0.5 per kg
-    const luggagePrice = totalWeight * weightMultiplier * 100; // Convert to rupees
-    const seatPrice = selectedSeats.length * 200; // ₹200 per seat selection
-    
-    return Math.round(basePrice + luggagePrice + seatPrice);
+    // Decision Variables
+    const basePrice = flight.price;
+    const weightCost = 0.5; // ₹0.5 per kg
+    const seatPremium = 200; // ₹200 per seat selection
+    const classMultiplier = flight.class === 'economy' ? 1 :
+                           flight.class === 'business' ? 1.5 : 2; // first class
+
+    // Objective Function: Maximize Revenue while keeping price reasonable
+    // Z = basePrice * passengers + weightCost * totalWeight + seatPremium * seats
+
+    // Constraints:
+    // 1. Total price cannot exceed 3x base price (affordability constraint)
+    // 2. Luggage cost cannot exceed 50% of ticket price
+    // 3. Minimum price must cover operational costs
+
+    const passengerRevenue = basePrice * passengerCount * classMultiplier;
+    const luggageCost = Math.min(
+      totalWeight * weightCost * 100, // Convert to rupees
+      passengerRevenue * 0.5 // Cannot exceed 50% of ticket price
+    );
+    const seatSelectionCost = selectedSeats.length * seatPremium;
+
+    // Apply constraints
+    const totalCost = passengerRevenue + luggageCost + seatSelectionCost;
+    const maxAllowedPrice = basePrice * passengerCount * 3;
+
+    return Math.min(Math.max(totalCost, basePrice * passengerCount), maxAllowedPrice);
   };
 
   const toggleSeat = (row: number, col: number) => {
     const seatId = `${row}-${col}`;
-    
+
     // Check if seat is already booked
     if (bookedSeats[seatId]) return;
 
@@ -76,7 +96,7 @@ export default function SeatSelection() {
     // 2. Store in database
     // 3. Handle payment processing
     // 4. Generate booking confirmation
-    
+
     // For now, we'll just show a success message
     alert('Booking confirmed! Total price: ₹' + calculateTotalPrice().toLocaleString('en-IN'));
     setLocation('/flights');
@@ -101,7 +121,7 @@ export default function SeatSelection() {
                 const seatId = `${row}-${col}`;
                 const isBooked = bookedSeats[seatId];
                 const isSelected = selectedSeats.includes(seatId);
-                
+
                 return (
                   <Button
                     key={seatId}
@@ -124,9 +144,9 @@ export default function SeatSelection() {
                 ₹{calculateTotalPrice().toLocaleString('en-IN')}
               </p>
             </div>
-            
-            <Button 
-              className="w-full" 
+
+            <Button
+              className="w-full"
               size="lg"
               onClick={handleConfirmBooking}
               disabled={selectedSeats.length !== passengerCount}
