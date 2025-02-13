@@ -9,6 +9,7 @@ import Components from "@/pages/components";
 import FlightSearch from "@/pages/flight-search";
 import FlightResults from "@/pages/flight-results";
 import FlightBooking from "@/pages/flight-booking";
+import LuggageSelection from "@/pages/luggage-selection";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
           <Route path="/flights" component={FlightSearch} />
           <Route path="/flight-results" component={FlightResults} />
           <Route path="/flight-booking" component={FlightBooking} />
+          <Route path="/luggage-selection" component={LuggageSelection} />
           <Route path="/components" component={Components} />
           <Route component={NotFound} />
         </Switch>

@@ -18,18 +18,18 @@ export default function FlightBooking() {
   const [, setLocation] = useLocation();
   const [category, setCategory] = useState("single");
   const [familySize, setFamilySize] = useState("3");
-  
+
   // Get flight data from URL params
   const searchParams = new URLSearchParams(window.location.search);
   const flightData = searchParams.get("flight");
-  
+
   if (!flightData) {
     setLocation("/flights");
     return null;
   }
 
   const flight: Flight = JSON.parse(decodeURIComponent(flightData));
-  
+
   // Calculate total passengers based on category
   const getPassengerCount = () => {
     switch (category) {
@@ -44,8 +44,15 @@ export default function FlightBooking() {
     }
   };
 
-  // Calculate total price
-  const totalPrice = flight.price * getPassengerCount();
+  const handleNext = () => {
+    const bookingData = {
+      flight,
+      category,
+      passengerCount: getPassengerCount(),
+    };
+    const bookingParam = encodeURIComponent(JSON.stringify(bookingData));
+    setLocation(`/luggage-selection?booking=${bookingParam}`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -62,7 +69,6 @@ export default function FlightBooking() {
                 <p className="text-sm text-muted-foreground">{flight.flightNumber}</p>
               </div>
               <div className="text-right">
-                <p className="font-medium">₹{flight.price.toLocaleString('en-IN')} / person</p>
                 <p className="text-sm text-muted-foreground capitalize">{flight.class}</p>
               </div>
             </div>
@@ -114,12 +120,12 @@ export default function FlightBooking() {
           <div className="pt-4 border-t">
             <div className="flex justify-between items-center">
               <p className="text-lg font-medium">Total Price ({getPassengerCount()} passengers)</p>
-              <p className="text-2xl font-bold">₹{totalPrice.toLocaleString('en-IN')}</p>
+              <p className="text-2xl font-bold">₹{ (flight.price * getPassengerCount()).toLocaleString('en-IN')}</p>
             </div>
           </div>
 
-          <Button className="w-full" size="lg">
-            Continue to Payment
+          <Button className="w-full" size="lg" onClick={handleNext}>
+            Next
           </Button>
         </CardContent>
       </Card>
