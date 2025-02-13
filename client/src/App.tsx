@@ -10,6 +10,7 @@ import FlightSearch from "@/pages/flight-search";
 import FlightResults from "@/pages/flight-results";
 import FlightBooking from "@/pages/flight-booking";
 import LuggageSelection from "@/pages/luggage-selection";
+import SeatSelection from "@/pages/seat-selection";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
           <Route path="/flight-results" component={FlightResults} />
           <Route path="/flight-booking" component={FlightBooking} />
           <Route path="/luggage-selection" component={LuggageSelection} />
+          <Route path="/seat-selection" component={SeatSelection} />
           <Route path="/components" component={Components} />
           <Route component={NotFound} />
         </Switch>

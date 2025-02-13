@@ -8,15 +8,14 @@ import { Luggage } from "lucide-react";
 
 interface LuggageInfo {
   weight: string;
-  count: string;
 }
 
 export default function LuggageSelection() {
   const [, setLocation] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const bookingData = searchParams.get("booking");
-  const [luggageInfo, setLuggageInfo] = useState<LuggageInfo[]>([{ weight: "", count: "1" }]);
-  
+  const [luggageInfo, setLuggageInfo] = useState<LuggageInfo[]>([{ weight: "" }]);
+
   if (!bookingData) {
     setLocation("/flights");
     return null;
@@ -26,13 +25,22 @@ export default function LuggageSelection() {
   const passengerCount = booking.passengerCount;
 
   const addLuggage = () => {
-    setLuggageInfo([...luggageInfo, { weight: "", count: "1" }]);
+    setLuggageInfo([...luggageInfo, { weight: "" }]);
   };
 
-  const updateLuggage = (index: number, field: keyof LuggageInfo, value: string) => {
+  const updateLuggage = (index: number, weight: string) => {
     const newLuggageInfo = [...luggageInfo];
-    newLuggageInfo[index] = { ...newLuggageInfo[index], [field]: value };
+    newLuggageInfo[index] = { weight };
     setLuggageInfo(newLuggageInfo);
+  };
+
+  const handleNext = () => {
+    const bookingWithLuggage = {
+      ...booking,
+      luggage: luggageInfo
+    };
+    const bookingParam = encodeURIComponent(JSON.stringify(bookingWithLuggage));
+    setLocation(`/seat-selection?booking=${bookingParam}`);
   };
 
   return (
@@ -49,34 +57,23 @@ export default function LuggageSelection() {
             <p className="text-sm text-muted-foreground">
               Total Passengers: {passengerCount}
             </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Add luggage entries as needed (max 32kg per piece)
+            </p>
           </div>
 
           {luggageInfo.map((luggage, index) => (
             <div key={index} className="space-y-4 p-4 border rounded-lg">
-              <h3 className="font-medium">Luggage {index + 1}</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Weight (kg)</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    max="32"
-                    value={luggage.weight}
-                    onChange={(e) => updateLuggage(index, "weight", e.target.value)}
-                    placeholder="Max 32 kg"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Number of Bags</Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="3"
-                    value={luggage.count}
-                    onChange={(e) => updateLuggage(index, "count", e.target.value)}
-                    placeholder="Max 3 bags"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label>Luggage {index + 1} Weight (kg)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="32"
+                  value={luggage.weight}
+                  onChange={(e) => updateLuggage(index, e.target.value)}
+                  placeholder="Max 32 kg"
+                />
               </div>
             </div>
           ))}
@@ -84,15 +81,20 @@ export default function LuggageSelection() {
           <Button 
             variant="outline" 
             onClick={addLuggage}
-            disabled={luggageInfo.length >= 3}
+            disabled={luggageInfo.length >= passengerCount * 2}
             className="w-full"
           >
             Add Another Luggage
           </Button>
 
           <div className="pt-4 border-t">
-            <Button className="w-full" size="lg">
-              Next
+            <Button 
+              className="w-full" 
+              size="lg" 
+              onClick={handleNext}
+              disabled={luggageInfo.some(l => !l.weight || Number(l.weight) <= 0)}
+            >
+              Continue to Seat Selection
             </Button>
           </div>
         </CardContent>
