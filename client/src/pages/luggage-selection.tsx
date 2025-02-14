@@ -23,6 +23,15 @@ export default function LuggageSelection() {
 
   const booking = JSON.parse(decodeURIComponent(bookingData));
   const passengerCount = booking.passengerCount;
+  const travelClass = booking.travelClass || "Economy"; // Default to Economy
+
+  // Define max weight limits based on class
+  const weightLimits: Record<string, number> = {
+    Economy: 20,
+    Business: 30,
+    "First Class": 40,
+  };
+  const maxWeight = weightLimits[travelClass] || 20;
 
   const addLuggage = () => {
     setLuggageInfo([...luggageInfo, { weight: "" }]);
@@ -37,7 +46,7 @@ export default function LuggageSelection() {
   const handleNext = () => {
     const bookingWithLuggage = {
       ...booking,
-      luggage: luggageInfo
+      luggage: luggageInfo,
     };
     const bookingParam = encodeURIComponent(JSON.stringify(bookingWithLuggage));
     setLocation(`/seat-selection?booking=${bookingParam}`);
@@ -58,7 +67,7 @@ export default function LuggageSelection() {
               Total Passengers: {passengerCount}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Add luggage entries as needed (max 32kg per piece)
+              Class: {travelClass} (Max {maxWeight}kg per luggage)
             </p>
           </div>
 
@@ -69,17 +78,17 @@ export default function LuggageSelection() {
                 <Input
                   type="number"
                   min="0"
-                  max="32"
+                  max={maxWeight} // Dynamically set based on class
                   value={luggage.weight}
                   onChange={(e) => updateLuggage(index, e.target.value)}
-                  placeholder="Max 32 kg"
+                  placeholder={`Max ${maxWeight} kg`}
                 />
               </div>
             </div>
           ))}
 
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={addLuggage}
             disabled={luggageInfo.length >= passengerCount * 2}
             className="w-full"
@@ -88,11 +97,11 @@ export default function LuggageSelection() {
           </Button>
 
           <div className="pt-4 border-t">
-            <Button 
-              className="w-full" 
-              size="lg" 
+            <Button
+              className="w-full"
+              size="lg"
               onClick={handleNext}
-              disabled={luggageInfo.some(l => !l.weight || Number(l.weight) <= 0)}
+              disabled={luggageInfo.some((l) => !l.weight || Number(l.weight) <= 0)}
             >
               Continue to Seat Selection
             </Button>
