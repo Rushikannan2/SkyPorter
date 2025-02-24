@@ -60,7 +60,7 @@ export default function FlightBooking() {
   };
 
   const handleBooking = (flight: Flight) => {
-    const travelClassMap = {
+    const travelClassMap: Record<string, string> = {
       economy: "Economy",
       business: "Business",
       first: "First Class"
@@ -68,7 +68,7 @@ export default function FlightBooking() {
 
     const bookingData = {
       flight,
-      category: travelClassMap[flight.class] || "Economy",
+      category: travelClassMap[flight.class.toLowerCase()] || "Economy",
       passengerCount: getPassengerCount(),
       basePrice: calculateTotalBasePrice(), // Use the calculated total base price
       pricePerPerson: flight.price // Store original price per person
