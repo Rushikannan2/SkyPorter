@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { SimplexSolver } from "./simplex";
+import { LuggageCalculator, TravelClass } from './luggage-calculator';
 
 const app = express();
 app.use(express.json());
@@ -34,6 +36,67 @@ app.use((req, res, next) => {
   });
 
   next();
+});
+
+app.post("/api/simplex", (req, res) => {
+  try {
+    const { objective, constraints, b, isMaximization = true } = req.body;
+
+    // Validate input
+    if (!objective || !constraints || !b) {
+      return res.status(400).json({ 
+        message: "Missing required parameters: objective, constraints, b" 
+      });
+    }
+
+    if (!Array.isArray(objective) || !Array.isArray(constraints) || !Array.isArray(b)) {
+      return res.status(400).json({ 
+        message: "Invalid input: objective, constraints, and b must be arrays" 
+      });
+    }
+
+    const solver = new SimplexSolver(objective, constraints, b, isMaximization);
+    const result = solver.solve();
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      message: error instanceof Error ? error.message : "Failed to solve linear program" 
+    });
+  }
+});
+
+const luggageCalculator = new LuggageCalculator();
+
+app.post('/api/calculate-luggage-charge', (req, res) => {
+    try {
+        const { luggageWeight, travelClass } = req.body;
+
+        // Input validation
+        if (typeof luggageWeight !== 'number' || luggageWeight <= 0) {
+            return res.status(400).json({
+                message: 'Invalid luggage weight'
+            });
+        }
+
+        if (!Object.values(TravelClass).includes(travelClass)) {
+            return res.status(400).json({
+                message: 'Invalid travel class. Must be ECONOMY, BUSINESS, or FIRST'
+            });
+        }
+
+        const result = luggageCalculator.calculateFare(
+            luggageWeight,
+            travelClass as TravelClass
+        );
+
+        res.json(result);
+
+    } catch (error) {
+        res.status(500).json({
+            message: error instanceof Error ? error.message : 'Failed to calculate fare'
+        });
+    }
 });
 
 (async () => {

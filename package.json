@@ -100,5 +100,10 @@
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
-  }
+  },
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ]
 }

@@ -44,12 +44,36 @@ export default function FlightBooking() {
     }
   };
 
-  const handleNext = () => {
+  // Calculate total base price based on passenger count and category
+  const calculateTotalBasePrice = () => {
+    const basePrice = flight.price;
+    switch (category) {
+      case "single":
+        return basePrice; // Original price for single passenger
+      case "couple":
+        return basePrice * 2; // Double price for couple
+      case "family":
+        return basePrice * parseInt(familySize); // n times price for family
+      default:
+        return basePrice;
+    }
+  };
+
+  const handleBooking = (flight: Flight) => {
+    const travelClassMap = {
+      economy: "Economy",
+      business: "Business",
+      first: "First Class"
+    };
+
     const bookingData = {
       flight,
-      category,
+      category: travelClassMap[flight.class] || "Economy",
       passengerCount: getPassengerCount(),
+      basePrice: calculateTotalBasePrice(), // Use the calculated total base price
+      pricePerPerson: flight.price // Store original price per person
     };
+
     const bookingParam = encodeURIComponent(JSON.stringify(bookingData));
     setLocation(`/luggage-selection?booking=${bookingParam}`);
   };
@@ -119,12 +143,18 @@ export default function FlightBooking() {
           {/* Total Price */}
           <div className="pt-4 border-t">
             <div className="flex justify-between items-center">
-              <p className="text-lg font-medium">Total Price ({getPassengerCount()} passengers)</p>
-              <p className="text-2xl font-bold">₹{ (flight.price * getPassengerCount()).toLocaleString('en-IN')}</p>
+              <div>
+                <p className="text-lg font-medium">Price Breakdown:</p>
+                <p className="text-sm text-gray-600">Base Price: ₹{flight.price.toLocaleString('en-IN')} per person</p>
+                <p className="text-sm text-gray-600">Passengers: {getPassengerCount()}</p>
+              </div>
+              <p className="text-2xl font-bold">
+                ₹{calculateTotalBasePrice().toLocaleString('en-IN')}
+              </p>
             </div>
           </div>
 
-          <Button className="w-full" size="lg" onClick={handleNext}>
+          <Button className="w-full mt-4" size="lg" onClick={() => handleBooking(flight)}>
             Next
           </Button>
         </CardContent>
