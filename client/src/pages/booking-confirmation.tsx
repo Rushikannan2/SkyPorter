@@ -29,6 +29,11 @@ export const BookingConfirmation: React.FC = () => {
   }
 
   const booking = JSON.parse(decodeURIComponent(bookingData));
+  
+  // Add default values if they don't exist
+  booking.selectedSeats = booking.selectedSeats || [];
+  booking.luggage = booking.luggage || [];
+  booking.passengerCount = booking.passengerCount || 1;
 
   if (isLoading) {
     return (
@@ -91,22 +96,22 @@ export const BookingConfirmation: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500">Airline</p>
-                    <p className="font-medium">{booking.flight.airline}</p>
+                    <p className="font-medium">{booking.flight?.airline || 'N/A'}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-500">Flight Number</p>
-                    <p className="font-medium">{booking.flight.flightNumber}</p>
+                    <p className="font-medium">{booking.flight?.flightNumber || 'N/A'}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between pt-2">
                   <div>
                     <p className="text-sm text-gray-500">From</p>
-                    <p className="font-medium">{booking.flight.departureCity}</p>
+                    <p className="font-medium">{booking.flight?.departureCity || 'N/A'}</p>
                   </div>
                   <div className="text-2xl text-blue-500">→</div>
                   <div className="text-right">
                     <p className="text-sm text-gray-500">To</p>
-                    <p className="font-medium">{booking.flight.arrivalCity}</p>
+                    <p className="font-medium">{booking.flight?.arrivalCity || 'N/A'}</p>
                   </div>
                 </div>
               </div>
@@ -115,14 +120,14 @@ export const BookingConfirmation: React.FC = () => {
                   <p className="text-sm text-gray-500">Date</p>
                   <p className="font-medium flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    {new Date(booking.flight.departureTime).toLocaleDateString()}
+                    {booking.flight?.departureTime ? new Date(booking.flight.departureTime).toLocaleDateString() : 'N/A'}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Time</p>
                   <p className="font-medium flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    {new Date(booking.flight.departureTime).toLocaleTimeString()}
+                    {booking.flight?.departureTime ? new Date(booking.flight.departureTime).toLocaleTimeString() : 'N/A'}
                   </p>
                 </div>
               </div>
@@ -130,7 +135,7 @@ export const BookingConfirmation: React.FC = () => {
           </div>
 
           {/* Passenger Details */}
-          {booking.passengers.map((passenger: any, index: number) => (
+          {(booking.passengers || []).map((passenger: any, index: number) => (
             <div key={index} className="rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
               <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-xl">
                 <h4 className="font-medium flex items-center gap-2">
@@ -142,19 +147,19 @@ export const BookingConfirmation: React.FC = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
                     <p className="text-sm text-gray-500">Name</p>
-                    <p className="font-medium">{passenger.name}</p>
+                    <p className="font-medium">{passenger?.name || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Age</p>
-                    <p className="font-medium">{passenger.age} years</p>
+                    <p className="font-medium">{passenger?.age ? `${passenger.age} years` : 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Gender</p>
-                    <p className="font-medium">{passenger.gender.charAt(0).toUpperCase() + passenger.gender.slice(1)}</p>
+                    <p className="font-medium">{passenger?.gender ? passenger.gender.charAt(0).toUpperCase() + passenger.gender.slice(1) : 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Seat</p>
-                    <p className="font-medium">{booking.selectedSeats[index]}</p>
+                    <p className="font-medium">{booking.selectedSeats[index] || 'Not assigned'}</p>
                   </div>
                 </div>
 
@@ -164,12 +169,12 @@ export const BookingConfirmation: React.FC = () => {
                     <p className="text-sm text-gray-500">Luggage Details</p>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    {booking.luggage
+                    {(booking.luggage || [])
                       .slice(index * Math.ceil(booking.luggage.length / booking.passengerCount), 
                              (index + 1) * Math.ceil(booking.luggage.length / booking.passengerCount))
                       .map((item: any, luggageIndex: number) => (
                         <div key={luggageIndex} className="bg-gray-50 p-2 rounded">
-                          Luggage {luggageIndex + 1}: <span className="font-medium">{item.weight}kg</span>
+                          Luggage {luggageIndex + 1}: <span className="font-medium">{item?.weight || 0}kg</span>
                         </div>
                       ))
                     }
@@ -184,22 +189,22 @@ export const BookingConfirmation: React.FC = () => {
             <h3 className="font-semibold mb-4">Price Breakdown</h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span>Base Ticket Price (₹{booking.pricePerPerson.toLocaleString('en-IN')} × {booking.passengerCount})</span>
-                <span className="font-medium">₹{booking.basePrice.toLocaleString('en-IN')}</span>
+                <span>Base Ticket Price (₹{(booking.pricePerPerson || 0).toLocaleString('en-IN')} × {booking.passengerCount})</span>
+                <span className="font-medium">₹{(booking.basePrice || 0).toLocaleString('en-IN')}</span>
               </div>
-              {booking.luggageCharges > 0 && (
+              {(booking.luggageCharges || 0) > 0 && (
                 <div className="flex justify-between items-center text-orange-600">
                   <span>Excess Luggage Charges</span>
-                  <span className="font-medium">₹{booking.luggageCharges.toLocaleString('en-IN')}</span>
+                  <span className="font-medium">₹{(booking.luggageCharges || 0).toLocaleString('en-IN')}</span>
                 </div>
               )}
               <div className="flex justify-between items-center">
-                <span>Seat Selection (₹400 × {booking.selectedSeats.length})</span>
-                <span className="font-medium">₹{(booking.selectedSeats.length * 400).toLocaleString('en-IN')}</span>
+                <span>Seat Selection (₹400 × {booking.selectedSeats?.length || 0})</span>
+                <span className="font-medium">₹{((booking.selectedSeats?.length || 0) * 400).toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t mt-2 text-lg font-bold">
                 <span>Total Amount</span>
-                <span className="text-green-600">₹{booking.totalPrice.toLocaleString('en-IN')}</span>
+                <span className="text-green-600">₹{(booking.totalPrice || 0).toLocaleString('en-IN')}</span>
               </div>
             </div>
           </div>

@@ -1,12 +1,19 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { SimplexSolver } from "./simplex";
-import { LuggageCalculator, TravelClass } from './luggage-calculator';
+import { LuggageCalculator, TravelClass } from './luggage-calculator.js';
+import session from "express-session";
+import { storage } from "./storage.js";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
 
 app.use((req, res, next) => {
   const start = Date.now();

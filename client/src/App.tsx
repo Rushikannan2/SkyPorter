@@ -12,21 +12,25 @@ import FlightBooking from "@/pages/flight-booking";
 import LuggageSelection from "@/pages/luggage-selection";
 import SeatSelection from "@/pages/seat-selection";
 import BookingConfirmation from "@/pages/booking-confirmation";
+import About from "@/pages/About";
+import PassengerDetails from "@/pages/passenger-details";
 
 function Router() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main>
+      <main className="min-h-[calc(100vh-4rem)]">
         <Switch>
           <Route path="/" component={FlightSearch} />
           <Route path="/flights" component={FlightSearch} />
           <Route path="/flight-results" component={FlightResults} />
           <Route path="/flight-booking" component={FlightBooking} />
+          <Route path="/passenger-details" component={PassengerDetails} />
           <Route path="/luggage-selection" component={LuggageSelection} />
           <Route path="/seat-selection" component={SeatSelection} />
           <Route path="/components" component={Components} />
           <Route path="/booking-confirmation" component={BookingConfirmation} />
+          <Route path="/about" component={About} />
           <Route component={NotFound} />
         </Switch>
       </main>
