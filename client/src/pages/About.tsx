@@ -35,7 +35,7 @@ export default function About() {
                   ZS
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-black">Ziya Shieh</h3>
+                  <h3 className="text-lg font-semibold text-black">Zia Shieh</h3>
                   <p className="text-gray-600">Lead Developer</p>
                 </div>
               </div>
@@ -86,7 +86,7 @@ export default function About() {
       <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-4 shadow-lg">
         <div className="container mx-auto px-4">
           <p className="text-center text-gray-700 text-sm">
-            © 2025 Flight Luggage System. Developed by Ziya Shieh, V T Rushi Kannan, Dr. P Sudarshan Babu. All rights reserved.
+            © 2025 Flight Luggage System. Developed by Zia Shieh, V T Rushi Kannan, Dr. P Sudarshan Babu. All rights reserved.
           </p>
         </div>
       </footer>
